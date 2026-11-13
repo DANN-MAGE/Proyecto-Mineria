@@ -1,0 +1,53 @@
+{
+  "personas_modelo": 353701,
+  "entrenamiento": 283042,
+  "prueba": 70659,
+  "hogares_entrenamiento": 153139,
+  "hogares_prueba": 38285,
+  "exactitud": 0.788519509192035,
+  "exactitud_base": 0.6867207291357081,
+  "aciertos": 55716,
+  "matriz": [
+    [
+      42351,
+      6172
+    ],
+    [
+      8771,
+      13365
+    ]
+  ],
+  "reporte": {
+    "Sí asistía": {
+      "precision": 0.8284300301240171,
+      "recall": 0.872802588463203,
+      "f1-score": 0.8500376335992774,
+      "support": 48523.0
+    },
+    "No asistía": {
+      "precision": 0.6840866049035164,
+      "recall": 0.6037676183592339,
+      "f1-score": 0.6414225037794256,
+      "support": 22136.0
+    },
+    "accuracy": 0.788519509192035,
+    "macro avg": {
+      "precision": 0.7562583175137667,
+      "recall": 0.7382851034112184,
+      "f1-score": 0.7457300686893515,
+      "support": 70659.0
+    },
+    "weighted avg": {
+      "precision": 0.7832102271168842,
+      "recall": 0.788519509192035,
+      "f1-score": 0.7846828378380547,
+      "support": 70659.0
+    }
+  },
+  "clases": [
+    "Sí asistía",
+    "No asistía"
+  ],
+  "profundidad": 3,
+  "hojas": 8
+}

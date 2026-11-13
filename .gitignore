@@ -1,0 +1,15 @@
+.venv/
+.python/
+.uv-cache/
+__pycache__/
+*.log
+*.py[cod]
+.env
+.env.*
+
+# Estos archivos se descargan o generan con los scripts del proyecto
+datos/*.zip
+datos/CNPV2018_*.CSV
+datos/poblacion_original.csv
+datos/poblacion_limpia.csv
+datos/datos_modelo.csv

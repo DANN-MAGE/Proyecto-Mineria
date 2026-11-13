@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Asistencia escolar · Barranquilla · Censo 2018</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <a class="saltar" href="#contenido">Saltar al contenido</a>
+
+    <!-- Menú lateral -->
+    <aside class="lateral">
+      <a class="marca" href="#inicio">
+        <span class="simbolo">B /</span> BARRANQUILLA<br>
+        <small>Educación y población</small>
+      </a>
+      <p class="etiqueta">PROYECTO DE MINERÍA DE DATOS</p>
+      <nav aria-label="Secciones del proyecto">
+        <a href="#inicio"><span>01</span> Inicio</a>
+        <a href="#datos"><span>02</span> Base de datos</a>
+        <a href="#limpieza"><span>03</span> Limpieza</a>
+        <a href="#analisis"><span>04</span> Análisis poblacional</a>
+        <a href="#arbol"><span>05</span> Árbol de decisión</a>
+        <a href="#predicciones"><span>06</span> Predicciones</a>
+        <a href="#resultados"><span>07</span> Resultados</a>
+      </nav>
+      <div class="nota-lateral">
+        <span class="punto"></span> Una sola fuente oficial<br><strong>DANE · Censo 2018</strong><br>Personas de Barranquilla.<br>Un proyecto para aprender.
+      </div>
+    </aside>
+    <main id="contenido">
+
+      <!-- Inicio -->
+      <header id="inicio" class="portada">
+        <div class="cabecera">
+          <span>POBLACIÓN / EDUCACIÓN / DATOS</span><span>BARRANQUILLA, COLOMBIA</span>
+        </div>
+        <p class="etiqueta">CENSO 2018 · PERSONAS DE 5 A 24 AÑOS</p>
+        <h1>Análisis de datos poblacionales de Barranquilla mediante árboles de decisión</h1>
+        <p class="introduccion">La asistencia escolar, vista desde los datos.</p>
+        <p>Usamos la edad, el sexo y el parentesco para estimar si una persona <strong>asistía o no a una institución educativa</strong>, según los patrones del Censo 2018.</p>
+        <a class="boton" href="#predicciones">Probar el árbol <span aria-hidden="true">↗</span></a>
+        <a class="enlace-portada" href="#datos">Conocer los datos ↓</a>
+        <div class="indicadores">
+          <div>
+            <strong>{{ '{:,}'.format(limpieza.originales).replace(',', '.') }}</strong><span>Personas en la base original</span>
+          </div>
+          <div>
+            <strong>{{ '{:,}'.format(resultados.personas_modelo).replace(',', '.') }}</strong><span>Personas utilizadas en el modelo</span>
+          </div>
+          <div>
+            <strong>{{ '%.2f'|format(resultados.exactitud * 100) }}%</strong><span>Exactitud en el conjunto de prueba</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- Fuente y datos de ejemplo -->
+      <section id="datos">
+        <p class="etiqueta">01 / UNA FUENTE VERIFICABLE</p>
+        <h2>Un censo. Más de un millón de registros.</h2>
+        <p>Fuente única: <a href="{{ fuente.pagina }}">{{ fuente.nombre }}</a>. Del archivo <strong>08_Atlantico.zip</strong> se extrajo PERSONAS y se filtró Barranquilla: <strong>U_DPTO = 08</strong> y <strong>U_MPIO = 001</strong>. Juntos forman el código 08001.</p>
+        <dl class="ficha">
+          <div>
+            <dt>Año disponible</dt>
+            <dd>2018</dd>
+          </div>
+          <div>
+            <dt>Unidad de análisis</dt>
+            <dd>Una persona censada</dd>
+          </div>
+          <div>
+            <dt>Alcance del modelo</dt>
+            <dd>De 5 a 24 años</dd>
+          </div>
+          <div>
+            <dt>Variable objetivo</dt>
+            <dd>PA_ASISTENCIA</dd>
+          </div>
+        </dl>
+        <h3>Algunos registros reales de Barranquilla</h3>
+        <div class="tabla">
+          <table>
+            <caption>Muestra de las columnas seleccionadas; las edades son códigos de grupos quinquenales.</caption>
+            <thead>
+              <tr>
+                <th>Departamento</th>
+                <th>Municipio</th>
+                <th>Grupo edad</th>
+                <th>Sexo</th>
+                <th>Parentesco</th>
+                <th>Asistencia</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for fila in muestra %}
+                <tr>
+                  <td>{{ fila.U_DPTO }}</td>
+                  <td>{{ fila.U_MPIO }}</td>
+                  <td>{{ fila.P_EDADR }}</td>
+                  <td>{{ fila.P_SEXO }}</td>
+                  <td>{{ fila.P_PARENTESCOR }}</td>
+                  <td>{{ fila.PA_ASISTENCIA }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <p>La muestra general puede incluir personas mayores de 24 años. La selección de 5–24 años se realiza solo para el modelo.</p>
+        <details>
+          <summary>Columnas originales y significado de los códigos</summary>
+          <p>El CSV original conserva las {{ fuente.columnas_originales|length }} columnas de PERSONAS:</p>
+          <p class="codigos">{{ fuente.columnas_originales|join(', ') }}</p>
+          <p>Para el análisis seleccionamos: {{ limpieza.columnas_limpias|join(', ') }}. Los códigos de encuesta, vivienda, hogar y persona identifican registros anónimos; no son entradas del árbol.</p>
+          <ul>
+            <li><a href="{{ fuente.edad }}">P_EDADR</a>: 2 = 5–9 años; 3 = 10–14; 4 = 15–19; 5 = 20–24.</li>
+            <li><a href="{{ fuente.sexo }}">P_SEXO</a>: 1 = hombre; 2 = mujer.</li>
+            <li><a href="{{ fuente.parentesco }}">P_PARENTESCOR</a>: jefe(a), pareja, hijo(a), otro pariente u otro no pariente; 6 = no aplica.</li>
+            <li><a href="{{ fuente.asistencia }}">PA_ASISTENCIA</a>: 1 = sí; 2 = no; 4 = no aplica; 9 = no informa. El archivo también contiene valores vacíos.</li>
+          </ul>
+        </details>
+      </section>
+
+      <!-- Limpieza de datos -->
+      <section id="limpieza">
+        <p class="etiqueta">02 / PREPARAR LOS DATOS</p>
+        <h2>Limpiar sin inventar respuestas.</h2>
+        <div class="pasos">
+          <div>
+            <b>1</b><h3>Revisar</h3>
+            <p>{{ '{:,}'.format(limpieza.originales).replace(',', '.') }} registros originales y {{ limpieza.duplicados_eliminados }} duplicados exactos eliminados.</p>
+          </div>
+          <div>
+            <b>2</b><h3>Conservar</h3>
+            <p>{{ '{:,}'.format(limpieza.limpios).replace(',', '.') }} registros en el CSV limpio, con todas las edades y los códigos no aplicables.</p>
+          </div>
+          <div>
+            <b>3</b><h3>Seleccionar</h3>
+            <p>{{ '{:,}'.format(limpieza.personas_modelo).replace(',', '.') }} personas utilizables para entrenar y evaluar el árbol.</p>
+          </div>
+        </div>
+        <p>Los identificadores se conservan como texto. Las variables del modelo se convierten a números. Dos personas con la misma edad, sexo y parentesco siguen siendo dos registros válidos.</p>
+        <div class="tabla">
+          <table>
+            <caption>Valores vacíos en las columnas seleccionadas, antes de limpiar</caption>
+            <thead>
+              <tr>
+                <th>Columna</th>
+                <th>Vacíos</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for columna, cantidad in limpieza.nulos_originales.items() %}
+                <tr>
+                  <td>{{ columna }}</td>
+                  <td>{{ '{:,}'.format(cantidad).replace(',', '.') }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="aviso">
+          No se reemplazan respuestas faltantes por “No asistía”. Los vacíos de hogar o parentesco pueden corresponder a alojamientos especiales y se conservan en la base general.
+        </div>
+        <p>De {{ '{:,}'.format(limpieza.personas_5_24).replace(',', '.') }} personas de 5–24 años, se excluyen del modelo {{ '{:,}'.format(limpieza.sin_respuesta_modelo).replace(',', '.') }} sin respuesta 1 o 2, {{ limpieza.sin_entradas_modelo }} adicionales con entradas no utilizables y {{ limpieza.sin_hogar_modelo }} adicionales sin identificador de hogar. El resto de edades permanece en el CSV limpio.</p>
+      </section>
+
+      <!-- Gráficas de población -->
+      <section id="analisis">
+        <p class="etiqueta">03 / EXPLORAR LA POBLACIÓN</p>
+        <h2>Edades, sexo y asistencia educativa.</h2>
+        <p>Las dos primeras gráficas describen a todas las personas de Barranquilla en la base. La tercera muestra las respuestas de 5–24 años, incluidos vacíos; la cuarta usa únicamente los registros seleccionados para el modelo.</p>
+        <figure>
+          <a href="{{ url_for('imagen', nombre='graficas.png') }}" target="_blank" rel="noopener">
+          <img src="{{ url_for('imagen', nombre='graficas.png') }}" alt="Cuatro gráficas: población por edad, población por sexo, asistencia de 5 a 24 años y porcentaje de asistencia por grupo de edad" loading="lazy">
+          </a><figcaption>Fuente: DANE, CNPV 2018. Las barras de edad representan grupos de diferente amplitud. Abre la imagen para ampliar.</figcaption>
+        </figure>
+        <p>Solo se analiza 2018; esta base no permite mostrar una evolución anual.</p>
+      </section>
+
+      <!-- Árbol de decisión -->
+      <section id="arbol">
+        <p class="etiqueta">04 / EL MODELO DE CLASIFICACIÓN</p>
+        <h2>Preguntas sencillas, dos respuestas posibles.</h2>
+        <p>El árbol aprende relaciones entre <strong>grupo de edad, sexo y parentesco</strong>. La etiqueta es la respuesta censal PA_ASISTENCIA; nunca se utiliza como entrada.</p>
+        <div class="rangos">
+          <div>
+            <span class="nivel si">Clase 1</span><strong>Sí asistía</strong>
+          </div>
+          <div>
+            <span class="nivel no">Clase 2</span><strong>No asistía</strong>
+          </div>
+        </div>
+        <p>El parentesco se representa con columnas de 0 y 1, una por categoría. Así se evita interpretarlo como una escala numérica. No se usan actividad laboral, nivel educativo o alfabetismo, para reducir el riesgo de revelar indirectamente la respuesta.</p>
+        <figure>
+          <a href="{{ url_for('imagen', nombre='arbol.png') }}" target="_blank" rel="noopener">
+          <img src="{{ url_for('imagen', nombre='arbol.png') }}" alt="Árbol de decisión entrenado: cada rama compara una característica y cada hoja predice Sí asistía o No asistía" loading="lazy">
+          </a><figcaption>Profundidad: {{ resultados.profundidad }}. Hojas: {{ resultados.hojas }}. En el dibujo, samples cuenta personas y value las cantidades por clase. Abre para ampliar.</figcaption>
+        </figure>
+        <div class="aviso">
+          “Grupo de edad ≤ 3,5” separa los códigos 2 y 3 (5–14 años) de 4 y 5 (15–24 años). Las preguntas del árbol comparan códigos de grupos, no edades exactas.
+        </div>
+      </section>
+
+      <!-- Formulario de predicción -->
+      <section id="predicciones" class="seccion-prediccion">
+        <p class="etiqueta">05 / PROBAR UNA PREDICCIÓN</p>
+        <h2>¿Qué predice el árbol para este perfil?</h2>
+        <p>Selecciona las características de una persona de 5 a 24 años. El resultado representa patrones históricos del Censo 2018; no verifica la asistencia real de alguien ni predice su situación actual.</p>
+        <form method="post" action="{{ url_for('inicio') }}#predicciones">
+          <div class="campos">
+            <div>
+              <label for="P_EDADR">Grupo de edad</label>
+              <select name="P_EDADR" id="P_EDADR" required>
+                {% for codigo, nombre in opciones.P_EDADR.items() %}
+                  <option value="{{ codigo }}" {% if valores.P_EDADR == codigo %}selected{% endif %}>{{ nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label for="P_SEXO">Sexo registrado en el censo</label>
+              <select name="P_SEXO" id="P_SEXO" required>
+                {% for codigo, nombre in opciones.P_SEXO.items() %}
+                  <option value="{{ codigo }}" {% if valores.P_SEXO == codigo %}selected{% endif %}>{{ nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label for="P_PARENTESCOR">Parentesco con el jefe(a) del hogar</label>
+              <select name="P_PARENTESCOR" id="P_PARENTESCOR" required>
+                {% for codigo, nombre in opciones.P_PARENTESCOR.items() %}
+                  <option value="{{ codigo }}" {% if valores.P_PARENTESCOR == codigo %}selected{% endif %}>{{ nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <button class="boton" type="submit">Predecir <span aria-hidden="true">→</span></button>
+        </form>
+        {% if error %}
+          <div class="error" role="alert">
+            {{ error }}
+          </div>
+        {% endif %}
+        {% if prediccion %}
+          <div class="respuesta" role="status" data-prediccion="{{ codigo_prediccion }}">
+            <span>RESULTADO DEL ÁRBOL · CÓDIGO {{ codigo_prediccion }}</span><strong>{{ prediccion }}</strong><p>Perfil: {{ opciones.P_EDADR[valores.P_EDADR] }}, {{ opciones.P_SEXO[valores.P_SEXO] }}, {{ opciones.P_PARENTESCOR[valores.P_PARENTESCOR] }}. Modelo entrenado con datos históricos de 2018.</p>
+          </div>
+        {% endif %}
+      </section>
+
+      <!-- Resultados del modelo -->
+      <section id="resultados">
+        <p class="etiqueta">06 / EVALUACIÓN Y CONCLUSIONES</p>
+        <h2>Resultados en personas que el árbol no vio.</h2>
+        <div class="evaluacion">
+          <div>
+            <div class="resultado-grande">
+              {{ '%.2f'|format(resultados.exactitud * 100) }}<span>%</span>
+            </div>
+            <p><strong>{{ '{:,}'.format(resultados.aciertos).replace(',', '.') }} aciertos de {{ '{:,}'.format(resultados.prueba).replace(',', '.') }} personas de prueba.</strong></p>
+            <p>El entrenamiento usó {{ '{:,}'.format(resultados.entrenamiento).replace(',', '.') }} personas. Se separó al azar el 80% de los hogares para entrenamiento y el 20% para prueba, manteniendo a sus miembros juntos.</p>
+            <p>Responder siempre la clase más frecuente del entrenamiento obtiene {{ '%.2f'|format(resultados.exactitud_base * 100) }}% de exactitud en la misma prueba.</p>
+          </div>
+          <figure>
+            <img src="{{ url_for('imagen', nombre='matriz_confusion.png') }}" alt="Matriz de confusión: respuestas reales en filas, predicciones en columnas; la diagonal contiene los aciertos" loading="lazy">
+            <figcaption>La diagonal representa aciertos; las otras casillas muestran errores.</figcaption>
+          </figure>
+        </div>
+        <div class="tabla">
+          <table>
+            <caption>Evaluación por respuesta</caption>
+            <thead>
+              <tr>
+                <th>Clase</th>
+                <th>Precisión</th>
+                <th>Recuperación</th>
+                <th>Personas reales</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for clase in resultados.clases %}
+                <tr>
+                  <td>{{ clase }}</td>
+                  <td>{{ '%.2f'|format(resultados.reporte[clase].precision * 100) }}%</td>
+                  <td>{{ '%.2f'|format(resultados.reporte[clase].recall * 100) }}%</td>
+                  <td>{{ resultados.reporte[clase].support|int }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <p class="ayuda">Precisión: qué parte de las predicciones de una clase fue correcta. Recuperación: qué parte de las respuestas reales de esa clase identificó el árbol.</p>
+        <details>
+          <summary>Ver ejemplos reales de prueba</summary>
+          <div class="tabla">
+            <table>
+              <thead>
+                <tr>
+                  <th>Edad</th>
+                  <th>Sexo</th>
+                  <th>Parentesco</th>
+                  <th>Respuesta real</th>
+                  <th>Predicción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for fila in pruebas %}
+                  <tr>
+                    <td>{{ opciones.P_EDADR[fila.P_EDADR] }}</td>
+                    <td>{{ opciones.P_SEXO[fila.P_SEXO] }}</td>
+                    <td>{{ opciones.P_PARENTESCOR[fila.P_PARENTESCOR] }}</td>
+                    <td>{{ clases[fila.PA_ASISTENCIA] }}</td>
+                    <td>{{ clases[fila.prediccion] }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </details>
+        <h3>Qué podemos concluir</h3>
+        <ul>
+          <li>El árbol mejora frente a responder siempre la clase más común, aunque sigue cometiendo errores.</li>
+          <li>Las tres características disponibles no explican por completo la asistencia educativa. Una persona puede diferir del patrón de su grupo.</li>
+          <li>El estudio usa el censo de 2018 y personas de 5–24 años con respuestas completas. No demuestra causas ni está validado para otros años, edades o ciudades.</li>
+          <li>“No informa” y “No aplica” no se interpretan como “No asistía”. La ausencia de respuestas puede afectar la representatividad del modelo.</li>
+          <li>La separación por hogar reduce la similitud entre entrenamiento y prueba, pero no elimina toda relación entre vecinos o zonas.</li>
+        </ul>
+        <a class="descarga" href="{{ url_for('descargar_predicciones') }}">Descargar todas las predicciones de prueba (CSV) ↓</a>
+      </section>
+
+      <!-- Pie de página -->
+      <footer>
+        <strong>Barranquilla · Minería de datos</strong><span>Python · Pandas · Árbol de decisión · Flask<br>Fuente única: DANE, CNPV 2018. Proyecto académico.</span>
+      </footer>
+    </main>
+  </body>
+</html>

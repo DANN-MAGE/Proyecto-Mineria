@@ -1,0 +1,50 @@
+{
+  "originales": 1120103,
+  "limpios": 1120103,
+  "duplicados_eliminados": 0,
+  "nulos_originales": {
+    "U_DPTO": 0,
+    "U_MPIO": 0,
+    "UA_CLASE": 0,
+    "COD_ENCUESTAS": 0,
+    "U_VIVIENDA": 0,
+    "P_NROHOG": 4613,
+    "P_NRO_PER": 0,
+    "P_SEXO": 0,
+    "P_EDADR": 0,
+    "P_PARENTESCOR": 4613,
+    "PA_ASISTENCIA": 83793
+  },
+  "codigos_invalidos": {
+    "P_EDADR": 0,
+    "P_SEXO": 0,
+    "P_PARENTESCOR": 0,
+    "PA_ASISTENCIA": 0
+  },
+  "columnas_limpias": [
+    "U_DPTO",
+    "U_MPIO",
+    "UA_CLASE",
+    "COD_ENCUESTAS",
+    "U_VIVIENDA",
+    "P_NROHOG",
+    "P_NRO_PER",
+    "P_EDADR",
+    "P_SEXO",
+    "P_PARENTESCOR",
+    "PA_ASISTENCIA"
+  ],
+  "personas_5_24": 360060,
+  "fuera_edad_modelo": 760043,
+  "sin_respuesta_modelo": 6359,
+  "sin_entradas_modelo": 0,
+  "sin_hogar_modelo": 0,
+  "personas_modelo": 353701,
+  "asistencia_5_24": {
+    "si": 244411,
+    "no": 109290,
+    "no_informa": 4843,
+    "no_aplica": 0,
+    "vacio": 1516
+  }
+}

@@ -1,0 +1,655 @@
+/* Colores y estilos generales */
+:root {
+  --fondo: #f7f7f2;
+  --tinta: #183738;
+  --suave: #536568;
+  --verde: #166b68;
+  --linea: #d8dfd7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 26px;
+}
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--tinta);
+  font: 16px/1.7 "Segoe UI", Arial, sans-serif;
+}
+
+a {
+  color: var(--verde);
+  text-underline-offset: 4px;
+}
+
+a:hover {
+  color: #0c4947;
+}
+
+a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visible {
+  outline: 3px solid #b98220;
+  outline-offset: 4px;
+}
+
+.saltar {
+  position: fixed;
+  top: -80px;
+  left: 20px;
+  padding: 12px;
+  background: white;
+  z-index: 5;
+}
+
+.saltar:focus {
+  top: 10px;
+}
+
+/* Menú lateral */
+.lateral {
+  width: 248px;
+  position: fixed;
+  inset: 0 auto 0 0;
+  padding: 36px 26px;
+  background: #eef0e8;
+  border-right: 1px solid var(--linea);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.marca {
+  font-size: 15px;
+  font-weight: 750;
+  text-decoration: none;
+  line-height: 1.5;
+  color: var(--tinta);
+}
+
+.marca small {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--suave);
+}
+
+.simbolo {
+  display: block;
+  font: 46px Georgia, serif;
+  color: var(--verde);
+  margin-bottom: 15px;
+}
+
+.etiqueta {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  color: var(--verde);
+}
+
+.lateral > .etiqueta {
+  margin: 40px 0 15px;
+  font-size: 9px;
+}
+
+nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+nav a {
+  padding: 8px 0;
+  text-decoration: none;
+  color: #435558;
+  font-size: 13px;
+}
+
+nav a:hover {
+  text-decoration: underline;
+}
+
+nav span {
+  color: #7b8985;
+  font-size: 10px;
+  margin-right: 13px;
+}
+
+.nota-lateral {
+  margin-top: auto;
+  padding-top: 45px;
+  font-size: 11px;
+  color: var(--suave);
+  line-height: 1.9;
+}
+
+.nota-lateral strong {
+  display: inline-block;
+  font-size: 17px;
+  color: var(--tinta);
+  margin-top: 7px;
+}
+
+.punto {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #378578;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+/* Portada */
+main {
+  margin-left: 248px;
+  max-width: 1600px;
+}
+
+header, section, footer {
+  padding: 54px clamp(24px, 5.5vw, 85px);
+}
+
+.portada {
+  padding-top: 24px;
+  background: linear-gradient(115deg, #f3f2e9, #e9eee5);
+}
+
+.cabecera {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 9px;
+  letter-spacing: 1.4px;
+  color: var(--suave);
+  padding-bottom: 25px;
+  border-bottom: 1px solid #cbd7cc;
+  margin-bottom: 45px;
+}
+
+h1, h2 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 400;
+  letter-spacing: -1px;
+  line-height: 1.15;
+}
+
+h1 {
+  font-size: clamp(32px, 3.8vw, 58px);
+  max-width: 940px;
+  margin: 22px 0;
+}
+
+h2 {
+  font-size: clamp(28px, 2.9vw, 40px);
+  margin: 13px 0 25px;
+}
+
+h3 {
+  font-size: 18px;
+  line-height: 1.4;
+  margin: 24px 0 12px;
+}
+
+p {
+  max-width: 1000px;
+  color: var(--suave);
+}
+
+.introduccion {
+  font-size: 22px;
+  color: var(--tinta);
+  line-height: 1.5;
+}
+
+.portada > p:not(.etiqueta) {
+  max-width: 780px;
+}
+
+.boton {
+  display: inline-flex;
+  align-items: center;
+  gap: 40px;
+  padding: 13px 22px;
+  background: var(--verde);
+  border: 1px solid var(--verde);
+  border-radius: 4px;
+  color: white;
+  text-decoration: none;
+  font: 600 14px "Segoe UI", sans-serif;
+  cursor: pointer;
+}
+
+.boton:hover {
+  background: #0e5552;
+  color: white;
+}
+
+.enlace-portada {
+  display: inline-block;
+  font-size: 13px;
+  margin-left: 24px;
+}
+
+.indicadores {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 20px;
+  border-top: 1px solid #cbd7cc;
+  margin-top: 45px;
+  padding-top: 28px;
+}
+
+.indicadores strong {
+  display: block;
+  font-family: Georgia, serif;
+  font-size: 36px;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.indicadores span {
+  display: block;
+  font-size: 11px;
+  color: var(--suave);
+  margin-top: 7px;
+}
+
+/* Secciones y tablas */
+section {
+  border-bottom: 1px solid var(--linea);
+}
+
+.aviso {
+  border-left: 3px solid #6b9d8c;
+  background: #edf2e9;
+  padding: 17px 20px;
+  margin: 25px 0;
+  font-size: 14px;
+}
+
+.ficha {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--linea);
+}
+
+dt {
+  font-size: 11px;
+  color: var(--suave);
+}
+
+dd {
+  margin: 6px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tabla {
+  overflow-x: auto;
+  margin: 20px 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+th {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  color: var(--suave);
+  background: #ecf0e9;
+}
+
+td, th {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--linea);
+}
+
+caption {
+  text-align: left;
+  font-size: 12px;
+  color: var(--suave);
+  padding: 8px 0;
+  white-space: normal;
+}
+
+details {
+  border: 1px solid var(--linea);
+  padding: 16px 20px;
+  margin: 22px 0;
+  border-radius: 4px;
+}
+
+summary {
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.codigos {
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+
+.descarga {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
+.pasos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 28px;
+  margin: 35px 0 20px;
+}
+
+.pasos b {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid #a9c1ae;
+  border-radius: 50%;
+  color: var(--verde);
+  font-size: 13px;
+}
+
+.pasos h3 {
+  margin-top: 12px;
+}
+
+.pasos p {
+  font-size: 14px;
+}
+
+/* Imágenes y categorías */
+figure {
+  margin: 25px 0;
+}
+
+img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--linea);
+  border-radius: 4px;
+  background: white;
+}
+
+figcaption, .ayuda {
+  font-size: 12px;
+  color: var(--suave);
+  margin-top: 12px;
+}
+
+.rangos {
+  display: flex;
+  margin: 30px 0;
+  border-top: 1px solid var(--linea);
+  border-bottom: 1px solid var(--linea);
+}
+
+.rangos > div {
+  flex: 1;
+  padding: 20px 12px;
+}
+
+.rangos strong {
+  display: block;
+  font-weight: 500;
+  font-size: 19px;
+  margin-top: 10px;
+}
+
+.nivel {
+  display: inline-block;
+  border-radius: 4px;
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.si {
+  color: #1e5b52;
+  background: #dcece1;
+}
+
+.no {
+  color: #873e2e;
+  background: #f3ded6;
+}
+
+/* Formulario y mensajes */
+.seccion-prediccion {
+  background: #eef2eb;
+}
+
+.campos {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.4fr;
+  gap: 20px;
+  margin: 30px 0;
+}
+
+label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+select {
+  width: 100%;
+  padding: 13px 10px;
+  font: 14px "Segoe UI", sans-serif;
+  color: var(--tinta);
+  border: 1px solid #aebfb1;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.respuesta {
+  margin-top: 25px;
+  padding: 25px;
+  border: 1px solid #8cb09d;
+  background: white;
+}
+
+.respuesta > span {
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.respuesta > strong {
+  display: block;
+  font: 40px Georgia, serif;
+  margin: 12px 0;
+}
+
+.respuesta p {
+  font-size: 14px;
+  margin-bottom: 0;
+}
+
+.error {
+  padding: 15px;
+  background: #f9e5df;
+  border-left: 3px solid #a83e26;
+  color: #7c291a;
+  margin-top: 20px;
+}
+
+/* Resultados y pie de página */
+.evaluacion {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  align-items: center;
+}
+
+.resultado-grande {
+  font: 70px Georgia, serif;
+  color: var(--verde);
+  line-height: 1.2;
+}
+
+.resultado-grande span {
+  font-size: 36px;
+}
+
+.evaluacion p {
+  font-size: 14px;
+}
+
+.evaluacion figure {
+  margin: 0;
+}
+
+li {
+  margin: 12px 0;
+  color: var(--suave);
+  font-size: 14px;
+}
+
+footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 25px;
+  padding-top: 28px;
+  padding-bottom: 28px;
+  font-size: 12px;
+}
+
+footer span {
+  text-align: right;
+  color: var(--suave);
+  font-size: 11px;
+}
+
+/* Pantallas medianas */
+@media (max-width: 1050px) {
+  .lateral {
+    width: 210px;
+    padding: 25px 18px;
+  }
+  main {
+    margin-left: 210px;
+  }
+  .ficha {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .campos {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+/* Celulares */
+@media (max-width: 760px) {
+  .lateral {
+    position: static;
+    width: 100%;
+    padding: 18px 22px;
+    border-right: 0;
+    border-bottom: 1px solid var(--linea);
+  }
+  .marca {
+    font-size: 13px;
+  }
+  .simbolo {
+    display: inline;
+    font-size: 24px;
+    margin-right: 10px;
+  }
+  .marca small, .lateral > .etiqueta, .nota-lateral {
+    display: none;
+  }
+  nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px 15px;
+    margin-top: 12px;
+  }
+  nav a {
+    font-size: 11px;
+    padding: 3px 0;
+  }
+  nav span {
+    display: none;
+  }
+  main {
+    margin: 0;
+  }
+  header, section {
+    padding: 35px 23px;
+  }
+  .cabecera {
+    margin-bottom: 28px;
+    font-size: 8px;
+  }
+  .cabecera span:last-child {
+    display: none;
+  }
+  h1 {
+    font-size: 36px;
+  }
+  .introduccion {
+    font-size: 19px;
+  }
+  .indicadores {
+    gap: 14px;
+    grid-template-columns: 1fr;
+  }
+  .indicadores > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .indicadores strong {
+    font-size: 30px;
+  }
+  .indicadores span {
+    max-width: 145px;
+    text-align: right;
+  }
+  .pasos, .evaluacion {
+    grid-template-columns: 1fr;
+  }
+  .pasos {
+    gap: 10px;
+  }
+  .enlace-portada {
+    margin: 15px 0 0 15px;
+  }
+  .evaluacion figure {
+    max-width: 500px;
+  }
+  footer {
+    flex-direction: column;
+    padding: 25px;
+  }
+  footer span {
+    text-align: left;
+  }
+}
+
+/* Desactivar animaciones si el usuario lo prefiere */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
