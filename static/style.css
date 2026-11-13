@@ -539,6 +539,45 @@ footer span {
   font-size: 11px;
 }
 
+/* Guía del proyecto */
+.guia-proyecto {
+  padding-left: 26px;
+}
+
+.guia-proyecto > li {
+  padding-left: 8px;
+  margin: 18px 0;
+}
+
+.guia-proyecto > li::marker {
+  color: var(--verde);
+  font-weight: 700;
+}
+
+.guia-proyecto details {
+  margin: 0;
+  background: #fff;
+}
+
+.guia-proyecto summary {
+  color: var(--tinta);
+}
+
+.guia-proyecto code {
+  font-family: Consolas, monospace;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.guia-proyecto pre {
+  padding: 16px;
+  background: #edf2e9;
+  border-radius: 4px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.6;
+}
+
 /* Pantallas medianas */
 @media (max-width: 1050px) {
   .lateral {

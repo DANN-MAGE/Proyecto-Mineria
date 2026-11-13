@@ -24,6 +24,7 @@
         <a href="#arbol"><span>05</span> Árbol de decisión</a>
         <a href="#predicciones"><span>06</span> Predicciones</a>
         <a href="#resultados"><span>07</span> Resultados</a>
+        <a href="#paso-a-paso"><span>08</span> Cómo se hizo</a>
       </nav>
       <div class="nota-lateral">
         <span class="punto"></span> Una sola fuente oficial<br><strong>DANE · Censo 2018</strong><br>Personas de Barranquilla.<br>Un proyecto para aprender.
@@ -322,6 +323,157 @@
           <li>La separación por hogar reduce la similitud entre entrenamiento y prueba, pero no elimina toda relación entre vecinos o zonas.</li>
         </ul>
         <a class="descarga" href="{{ url_for('descargar_predicciones') }}">Descargar todas las predicciones de prueba (CSV) ↓</a>
+      </section>
+
+      <!-- Explicación del proyecto -->
+      <section id="paso-a-paso" aria-labelledby="titulo-guia">
+        <p class="etiqueta">07 / PASO A PASO</p>
+        <h2 id="titulo-guia">Cómo se hizo este proyecto.</h2>
+        <p>Esta guía sigue el orden del trabajo, desde descargar el censo hasta mostrar una predicción en la página. Abre cada paso para ver la explicación. Los fragmentos de código muestran las instrucciones principales; los archivos completos están en <a href="https://github.com/DANN-MAGE/Proyecto-Mineria">el repositorio del proyecto</a>.</p>
+
+        <ol class="guia-proyecto">
+          <li>
+            <details open>
+              <summary>Definir qué se quiere predecir</summary>
+              <p>La pregunta fue: ¿una persona de Barranquilla asistía a una institución educativa en 2018? El censo ya contiene la respuesta en <code>PA_ASISTENCIA</code>: 1 significa «Sí» y 2 significa «No». Se eligieron personas de 5 a 24 años.</p>
+              <p>Se tomó como referencia el árbol trabajado en clase. Pandas permite leer y organizar las tablas; scikit-learn permite entrenar y evaluar el árbol; Matplotlib dibuja las gráficas; Flask muestra los resultados en la web. Las librerías se encuentran en <code>requirements.txt</code>.</p>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>Descargar los datos y separar Barranquilla</summary>
+              <p><code>descargar_datos.py</code> descarga <code>08_Atlantico.zip</code> del <a href="{{ fuente.pagina }}">Censo 2018 del DANE</a>, abre el archivo PERSONAS y lo lee por partes para usar menos memoria.</p>
+              <pre><code>barranquilla = parte[
+    (parte["U_DPTO"] == "08") &amp; (parte["U_MPIO"] == "001")
+]</code></pre>
+              <p>El departamento 08 y el municipio 001 forman el código 08001. Los códigos se leen como texto para conservar los ceros. El resultado se guarda en <code>datos/poblacion_original.csv</code>, con {{ '{:,}'.format(limpieza.originales).replace(',', '.') }} personas y las {{ fuente.columnas_originales|length }} columnas originales.</p>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>Revisar y limpiar la tabla</summary>
+              <p><code>limpieza_datos.py</code> selecciona las columnas necesarias y revisa tipos de datos, vacíos y duplicados.</p>
+              <pre><code>df.info()
+nulos = df.isnull().sum()
+duplicados = df.duplicated().sum()
+df = df.drop_duplicates().copy()</code></pre>
+              <p>Se usan también los códigos de cada persona para revisar duplicados: dos personas con las mismas características no son una sola. Los códigos demográficos se comparan con el diccionario del DANE. Una respuesta vacía se conserva vacía, porque no significa «No asistía».</p>
+              <p>Se guarda <code>datos/poblacion_limpia.csv</code> con todas las edades. <code>resumen_limpieza.json</code> conserva los conteos de la limpieza y <code>resumen_poblacion.csv</code> contiene los seis perfiles más frecuentes, agrupados para mostrarlos en la página.</p>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>Seleccionar las personas para el árbol</summary>
+              <p><code>arbol_decision.py</code> lee el CSV limpio y conserva los códigos de edad 2, 3, 4 y 5, que corresponden a 5–9, 10–14, 15–19 y 20–24 años.</p>
+              <pre><code>datos = df[df["P_EDADR"].isin([2, 3, 4, 5])].copy()
+datos = datos[datos["PA_ASISTENCIA"].isin([1, 2])]</code></pre>
+              <p>También se revisan sexo, parentesco e identificación del hogar. «No aplica», «No informa» y los valores faltantes se excluyen del modelo cuando impiden usar una fila. Permanecen {{ '{:,}'.format(resultados.personas_modelo).replace(',', '.') }} personas utilizables; el programa comprueba que sean más de 10.000 y que los datos correspondan a Barranquilla.</p>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>Preparar las entradas y la respuesta</summary>
+              <p>Las entradas son grupo de edad (<code>P_EDADR</code>), sexo (<code>P_SEXO</code>) y parentesco (<code>P_PARENTESCOR</code>). La respuesta que queremos aprender es <code>PA_ASISTENCIA</code>; no se incluye entre las entradas.</p>
+              <pre><code>entradas = datos[["P_EDADR", "P_SEXO"]].copy()
+for codigo in [1, 2, 3, 4, 5]:
+    entradas["P_PARENTESCOR_" + str(codigo)] = (
+        datos["P_PARENTESCOR"] == codigo
+    ).astype(int)
+X = entradas.to_numpy()
+y = datos["PA_ASISTENCIA"].to_numpy()</code></pre>
+              <p>El parentesco se convierte en cinco columnas de 0 y 1. Para un hijo o hijastro, por ejemplo, quedan <code>[0, 0, 1, 0, 0]</code>. Así el árbol no interpreta que un parentesco sea «mayor» que otro. <code>X</code> contiene las características y <code>y</code>, las respuestas reales.</p>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>Separar entrenamiento y prueba por hogares</summary>
+              <p>Se unen los códigos de encuesta, vivienda y hogar para identificar a quienes viven juntos. Se reparte el 80% de los hogares para aprender y el 20% para probar.</p>
+              <pre><code>datos["hogar"] = (
+    datos["COD_ENCUESTAS"] + "-" + datos["U_VIVIENDA"]
+    + "-" + datos["P_NROHOG"]
+)
+hogares_entrenamiento, hogares_prueba = train_test_split(
+    datos["hogar"].unique(), test_size=0.20, random_state=42
+)</code></pre>
+              <p>Después se seleccionan las personas de cada grupo para formar <code>X_train</code>, <code>y_train</code>, <code>X_test</code> y <code>y_test</code>. Todos los miembros de un hogar quedan juntos para evitar evaluar con familiares de las personas usadas al entrenar.</p>
+              <p>Quedaron {{ '{:,}'.format(resultados.entrenamiento).replace(',', '.') }} personas de entrenamiento y {{ '{:,}'.format(resultados.prueba).replace(',', '.') }} de prueba. Se comprueba que ambos grupos tengan respuestas «Sí» y «No». El valor 42 fija el sorteo para poder repetir la separación con los mismos datos.</p>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>Crear el árbol y entrenarlo con fit()</summary>
+              <pre><code>modelo = tree.DecisionTreeClassifier(
+    max_depth=3, min_samples_leaf=100, random_state=42
+)
+modelo.fit(X_train, y_train)</code></pre>
+              <p><code>DecisionTreeClassifier</code> crea el árbol. <code>max_depth=3</code> limita la cantidad de niveles de preguntas y <code>min_samples_leaf=100</code> exige al menos 100 personas de entrenamiento en cada hoja.</p>
+              <p><code>.fit()</code> busca preguntas que ayuden a separar las respuestas «Sí» y «No» usando solo el grupo de entrenamiento. El árbol resultante tiene {{ resultados.profundidad }} niveles de preguntas y {{ resultados.hojas }} hojas.</p>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>Predecir y contar los aciertos</summary>
+              <pre><code>predicciones = modelo.predict(X_test)
+exactitud = accuracy_score(y_test, predicciones)
+matriz = confusion_matrix(y_test, predicciones, labels=[1, 2])</code></pre>
+              <p><code>.predict()</code> recorre el árbol con las características de las personas de prueba, sin recibir sus respuestas reales. Después se comparan las predicciones con <code>y_test</code>.</p>
+              <p><code>accuracy_score()</code> divide los aciertos entre el total de personas de prueba: {{ '{:,}'.format(resultados.aciertos).replace(',', '.') }} / {{ '{:,}'.format(resultados.prueba).replace(',', '.') }} = <strong>{{ '%.2f'|format(resultados.exactitud * 100) }}%</strong>. La matriz muestra qué respuestas se acertaron y cuáles se confundieron.</p>
+              <p><code>classification_report()</code> calcula los resultados por clase. También se compara el árbol con responder siempre la opción más frecuente del entrenamiento, que obtiene {{ '%.2f'|format(resultados.exactitud_base * 100) }}% en la prueba. Esto ayuda a interpretar si el árbol aporta una mejora.</p>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>Dibujar el árbol y las gráficas</summary>
+              <p><code>arbol_decision.py</code> usa <code>tree.plot_tree()</code> para dibujar el árbol y <code>ConfusionMatrixDisplay</code> para la matriz. Guarda las imágenes como <code>imagenes/arbol.png</code> y <code>imagenes/matriz_confusion.png</code>.</p>
+              <p>Para leer el árbol, se empieza arriba: si se cumple la pregunta, se sigue la rama izquierda; si no, la derecha. La hoja final indica «Sí asistía» o «No asistía».</p>
+              <p><code>graficas.py</code> cuenta las personas por edad, sexo y asistencia y guarda las cuatro gráficas en <code>imagenes/graficas.png</code>. Este archivo no vuelve a entrenar el modelo.</p>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>Guardar el modelo y sus resultados</summary>
+              <p><code>pickle.dump()</code> guarda el árbol entrenado y las opciones del formulario en <code>modelo.pkl</code>. Así la página puede cargarlo sin repetir el entrenamiento.</p>
+              <p><code>datos/resultados.json</code> conserva las métricas. <code>datos/datos_modelo.csv</code> indica qué personas quedaron en entrenamiento y prueba. <code>datos/predicciones_prueba.csv</code> guarda las respuestas reales y las predichas para compararlas.</p>
+              <p>Se guarda el mismo árbol que se evaluó: no se vuelve a entrenar con las personas reservadas para prueba.</p>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>Conectar el formulario con Flask</summary>
+              <p><code>app.py</code> carga el modelo, los resúmenes y los resultados. <code>templates/index.html</code> organiza las secciones y el formulario. <code>static/style.css</code> define los colores, los tamaños y la adaptación a celulares.</p>
+              <p>Al abrir la página, Flask recibe una petición GET y muestra el contenido. Al pulsar «Predecir», recibe una petición POST con edad, sexo y parentesco. Revisa que las opciones sean válidas y prepara las columnas en el mismo orden que durante el entrenamiento.</p>
+              <pre><code>nuevos_valores = [entrada]
+predicciones = modelo.predict(nuevos_valores)
+codigo_prediccion = int(predicciones[0])
+prediccion = guardado["clases"][codigo_prediccion]</code></pre>
+              <p>El código 1 o 2 se convierte en un texto que se muestra en la página. Cada envío usa el modelo guardado; no lo entrena ni guarda los datos del visitante. La predicción corresponde a patrones de 2018.</p>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>Comprobar que todo funcione</summary>
+              <p><code>verificar_proyecto.py</code> revisa los conteos, los códigos de edad, las dos respuestas y que ningún hogar esté en ambos grupos. Vuelve a calcular las predicciones y comprueba que coincidan con las guardadas.</p>
+              <p>También prueba las 40 combinaciones del formulario: 4 grupos de edad × 2 sexos × 5 parentescos. Revisa que se rechacen opciones inválidas y que se puedan cargar las imágenes y descargar el CSV.</p>
+              <p>Para repetir todo el análisis, se ejecutan estos archivos en orden, después de instalar las librerías:</p>
+              <pre><code>python descargar_datos.py
+python limpieza_datos.py
+python arbol_decision.py
+python graficas.py
+python verificar_proyecto.py
+python app.py</code></pre>
+              <p>En el entorno local preparado para este proyecto, se usa <code>.\.venv\Scripts\python.exe</code> en lugar de <code>python</code>. Descargar y entrenar se hace al preparar o actualizar el análisis; no en cada visita.</p>
+            </details>
+          </li>
+          <li>
+            <details>
+              <summary>Preparar la publicación en internet</summary>
+              <p>GitHub guarda el código del proyecto. <code>.gitignore</code> excluye el entorno de Python, las cachés, el ZIP y los CSV grandes que se pueden volver a generar.</p>
+              <p><code>render.yaml</code> configura un servicio Flask en Render. El servidor instala las librerías y usa Gunicorn para atender las visitas. La web lee el modelo entrenado, las imágenes, los resultados y los conteos agrupados que sí están en el repositorio.</p>
+              <p>Cuando el servicio termina de publicarse, se puede compartir su enlace sin que los visitantes instalen el proyecto. Las actualizaciones de código se activan desde Render con <strong>Manual Deploy → Deploy latest commit</strong>.</p>
+            </details>
+          </li>
+        </ol>
+        <div class="aviso">Para explicar el proyecto: primero se obtuvieron y limpiaron los datos, después se separaron hogares para entrenar y evaluar el árbol, y al final se conectó el modelo con el formulario de Flask.</div>
       </section>
 
       <!-- Pie de página -->
