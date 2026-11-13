@@ -2,6 +2,23 @@
 
 Este proyecto clasifica si una persona de **5 a 24 años** asistía o no a una institución educativa, según los patrones del **Censo 2018 del DANE**. Usa un árbol de decisión pequeño y una página local con Flask.
 
+## Publicar la página en internet
+
+[Publicar en Render](https://render.com/deploy?repo=https%3A%2F%2Fgithub.com%2FDANN-MAGE%2FProyecto-Mineria)
+
+1. Abre el enlace e inicia sesión o crea una cuenta en Render.
+2. Revisa que el servicio tenga el plan **Free** y confirma la creación.
+3. Espera a que termine la publicación. Render mostrará la dirección pública terminada en `.onrender.com`.
+4. Comparte esa dirección para abrir la página y usar el formulario sin instalar Python ni descargar el proyecto.
+
+`render.yaml` contiene la configuración. Render instala las librerías y ejecuta Flask con Gunicorn. Usa el modelo ya entrenado, las gráficas y los resultados del repositorio; no vuelve a entrenar durante la publicación. `datos/resumen_poblacion.csv` contiene los conteos de los seis perfiles más frecuentes por edad, sexo y parentesco; no contiene identificadores ni filas de personas individuales. Se actualiza con `limpieza_datos.py`. El modelo se entrenó con los 353.701 registros utilizables, no con estos seis grupos.
+
+La publicación automática está desactivada. Si subes cambios a GitHub, usa **Manual Deploy → Deploy latest commit** en Render para actualizar tu página. El plan gratuito se suspende después de 15 minutos sin visitas y puede tardar alrededor de un minuto en responder a la siguiente visita. Consulta la [guía de Flask](https://render.com/docs/deploy-flask) y las [condiciones del plan gratuito](https://render.com/docs/free).
+
+El enlace de publicación crea el servicio en tu cuenta; no es la dirección de la página ya publicada. La dirección definitiva la proporciona Render al completar la publicación.
+
+Se probó la página en una copia sin los CSV grandes ni el ZIP: cargaron el inicio, las imágenes, la descarga y las 40 combinaciones del formulario. La ejecución en el servidor de Render se comprobará cuando se cree el servicio.
+
 El archivo `arbol_ejemplo.py` se usó como referencia. El árbol sigue sus pasos: cargar datos, preparar entradas y etiquetas, crear `DecisionTreeClassifier`, entrenar con `.fit()`, predecir con `.predict()` y dibujar con `tree.plot_tree()`.
 
 ## Cómo se parece al ejemplo de clase
@@ -53,7 +70,7 @@ python -m venv .venv
 
 Después abre **http://127.0.0.1:5000**. Ejecuta los comandos en ese orden, esperando a que termine cada uno.
 
-El repositorio incluye el código, las imágenes, el modelo, las predicciones de prueba y los resúmenes. El ZIP del DANE y los CSV de población y selección del modelo se generan con los comandos anteriores; no se suben porque son archivos grandes que pueden recuperarse desde la fuente. Tampoco se suben el entorno de Python ni las cachés. Los archivos que ya tienes en tu computador se conservan.
+El repositorio incluye el código, las imágenes, el modelo, las predicciones de prueba y los resúmenes para la página. Puedes instalar las librerías y ejecutar `app.py` directamente para ver los resultados guardados. Para repetir el análisis y sus comprobaciones completas, ejecuta todos los comandos anteriores. El ZIP del DANE y los CSV de población y selección del modelo se generan con esos comandos; no se suben porque son archivos grandes que pueden recuperarse desde la fuente. Tampoco se suben el entorno de Python ni las cachés. Los archivos que ya tienes en tu computador se conservan.
 
 `arbol_ejemplo.py` se usó como referencia, pero actualmente no está en la carpeta. La comprobación de su integridad solo se ejecuta cuando ese archivo está presente.
 
@@ -199,6 +216,7 @@ python -m venv .venv
 | `imagenes/` | Gráficas generadas |
 | `modelo.pkl` | Árbol entrenado que usa la web |
 | `requirements.txt` | Librerías y versiones utilizadas |
+| `render.yaml` | Configuración para publicar Flask en Render |
 | `verificar_proyecto.py` | Comprobaciones reproducibles |
 | `README.md` | Explicación y comandos |
 

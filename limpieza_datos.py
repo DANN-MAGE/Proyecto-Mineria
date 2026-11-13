@@ -76,6 +76,10 @@ for columna in codigos:
 # Una respuesta vacía no significa que la persona no asistía
 # En alojamientos especiales, el hogar y el parentesco pueden estar vacíos
 df.to_csv(datos / "poblacion_limpia.csv", index=False, encoding="utf-8-sig")
+# Contar los seis perfiles más frecuentes para la tabla de la página
+grupos = df.groupby(["P_EDADR", "P_SEXO", "P_PARENTESCOR"]).size()
+grupos = grupos.reset_index(name="PERSONAS").sort_values("PERSONAS", ascending=False)
+grupos.head(6).to_csv(datos / "resumen_poblacion.csv", index=False, encoding="utf-8-sig")
 
 # Contar las personas que se pueden usar en el modelo
 

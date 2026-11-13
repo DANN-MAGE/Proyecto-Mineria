@@ -78,35 +78,31 @@
             <dd>PA_ASISTENCIA</dd>
           </div>
         </dl>
-        <h3>Algunos registros reales de Barranquilla</h3>
+        <h3>Perfiles más frecuentes en Barranquilla</h3>
         <div class="tabla">
           <table>
-            <caption>Muestra de las columnas seleccionadas; las edades son códigos de grupos quinquenales.</caption>
+            <caption>Cantidad de personas por grupo de edad, sexo y parentesco. Se muestran los seis perfiles más frecuentes.</caption>
             <thead>
               <tr>
-                <th>Departamento</th>
-                <th>Municipio</th>
                 <th>Grupo edad</th>
                 <th>Sexo</th>
                 <th>Parentesco</th>
-                <th>Asistencia</th>
+                <th>Personas</th>
               </tr>
             </thead>
             <tbody>
-              {% for fila in muestra %}
+              {% for fila in resumen_poblacion %}
                 <tr>
-                  <td>{{ fila.U_DPTO }}</td>
-                  <td>{{ fila.U_MPIO }}</td>
                   <td>{{ fila.P_EDADR }}</td>
                   <td>{{ fila.P_SEXO }}</td>
                   <td>{{ fila.P_PARENTESCOR }}</td>
-                  <td>{{ fila.PA_ASISTENCIA }}</td>
+                  <td>{{ fila.PERSONAS }}</td>
                 </tr>
               {% endfor %}
             </tbody>
           </table>
         </div>
-        <p>La muestra general puede incluir personas mayores de 24 años. La selección de 5–24 años se realiza solo para el modelo.</p>
+        <p>Cada fila agrupa personas con las mismas características; no es un registro individual. Este resumen considera todas las edades con estos tres datos disponibles. El modelo utiliza solo personas de 5–24 años.</p>
         <details>
           <summary>Columnas originales y significado de los códigos</summary>
           <p>El CSV original conserva las {{ fuente.columnas_originales|length }} columnas de PERSONAS:</p>

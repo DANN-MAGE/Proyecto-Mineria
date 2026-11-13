@@ -24,7 +24,7 @@ opciones = {
     "P_PARENTESCOR": guardado["parentescos"]
 }
 
-# Leer los resultados y las filas de ejemplo
+# Leer los resultados y el resumen de población
 
 with open(ruta / "datos/resultados.json", encoding="utf-8") as archivo:
     resultados = json.load(archivo)
@@ -35,8 +35,8 @@ with open(ruta / "datos/resumen_limpieza.json", encoding="utf-8") as archivo:
 with open(ruta / "datos/fuente.json", encoding="utf-8") as archivo:
     fuente = json.load(archivo)
 
-muestra = pd.read_csv(
-    ruta / "datos/poblacion_limpia.csv",
+resumen_poblacion = pd.read_csv(
+    ruta / "datos/resumen_poblacion.csv",
     dtype=str,
     nrows=6
 ).fillna("Vacío")
@@ -93,7 +93,7 @@ def inicio():
         prediccion=prediccion,
         codigo_prediccion=codigo_prediccion,
         error=error,
-        muestra=muestra.to_dict("records"),
+        resumen_poblacion=resumen_poblacion.to_dict("records"),
         pruebas=pruebas.to_dict("records")
     ), estado
 
